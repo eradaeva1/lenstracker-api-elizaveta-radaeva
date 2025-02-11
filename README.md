@@ -75,7 +75,7 @@ List technologies that will be used in your app, including any libraries to save
 Backend: Node.js, Express.js
 Database: MySQL
 Frontend: React 
-Push Notifications: Firebase Cloud Messaging
+
 AI Services:
 OpenAI API (AI chatbot for lens care guidance)
 
@@ -242,3 +242,5 @@ Push Notifications: Firebase Cloud Messaging (FCM) will be used to send real-tim
 
 
 Storing Interactions: Each interaction with the AI will be stored in MySQL for later reference and continuous improvement in response quality.
+
+Push Notifications: Firebase Cloud Messaging
