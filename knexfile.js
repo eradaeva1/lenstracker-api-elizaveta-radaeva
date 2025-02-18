@@ -1,11 +1,9 @@
 // Update with your config settings.
 
-/**
- * @type { Object.<string, import("knex").Knex.Config> }
- */
-module.exports = {
+
+export default {
   development: {
-    client: "mysql2", // ✅ Should be "mysql2", NOT "sqlite3"
+    client: "mysql2", // Use mysql2 instead of mysql
     connection: {
       host: "localhost",
       user: "root",

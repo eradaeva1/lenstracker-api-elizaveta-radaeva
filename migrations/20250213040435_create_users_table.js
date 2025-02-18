@@ -4,12 +4,11 @@
  */
 export async function up(knex) {
   return knex.schema.createTable("users", (table) => {
-    table.increments("id").primary(); // Auto-incrementing primary key
-    table.string("username").notNullable();
-    table.string("email").unique().notNullable();
+    table.increments("id").primary();
+    table.string("name").notNullable();
+    table.string("email").notNullable().unique();
     table.string("password").notNullable();
-    table.timestamp("created_at").defaultTo(knex.fn.now()); // Fix here
-    table.timestamp("updated_at").defaultTo(knex.fn.now()); // Fix here
+    table.timestamps(true, true);
   })
 };
 

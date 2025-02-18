@@ -85,20 +85,52 @@
 import express from 'express';
 import cors from 'cors';
 import knex from 'knex';
-import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import lensRoutes from './routes/lensRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
+import dotenv from "dotenv";
+import knexConfig from './knexfile.js';
+
+
+dotenv.config();
+
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const db = knex(require('./knexfile.js'));
+const db = knex(knexConfig.development);
+
+// Middleware to inject the DB into every route (optional, if you want to use DB in routes)
+app.use((req, res, next) => {
+    req.db = db;  // Inject the DB into the request object
+    next();
+  });
+  
+  // Use routes for different resources
+  app.use("/users", userRoutes);
+  app.use("/lenses", lensRoutes);
+  app.use("/reminders", reminderRoutes);
+  
+  // Graceful shutdown handler to close DB connection when server stops
+  process.on('SIGINT', () => {
+    console.log('Shutting down server...');
+    db.destroy()  // Close database connection gracefully
+      .then(() => {
+        console.log('DB connection closed.');
+        process.exit(0);
+      })
+      .catch(err => {
+        console.error('Error closing DB connection:', err);
+        process.exit(1);
+      });
+  });
+  
 
 // Use routes for different resources
-app.use('/api/auth', authRoutes(db));
-app.use('/api/lenses', lensRoutes(db));
-app.use('/api/reminders', reminderRoutes(db));
+app.use("/users", userRoutes);
+app.use("/lenses", lensRoutes);
+app.use("/reminders", reminderRoutes);
 
-const port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`Server running on port ${port}`));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

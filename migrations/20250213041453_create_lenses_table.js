@@ -11,6 +11,7 @@ export async function up(knex) {
     table.date("start_date").notNullable();
     table.date("end_date").notNullable();
     table.foreign("user_id").references("users.id").onDelete("CASCADE");
+    table.timestamps(true, true);
   })
 };
 
