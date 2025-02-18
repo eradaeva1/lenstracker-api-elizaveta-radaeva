@@ -8,30 +8,34 @@
 // reminders (smart reminders)
 // gamification (points/badges for habits)
 // chats (AI chatbot history)
+
+
 // 🟢 Day 2: User Authentication (JWT & Sessions)
 // ✅ Implement user authentication with JWT tokens.
 // ✅ API Routes:
-
 // POST /users/signup
 // POST /users/login
 // GET /users/me (protected route)
 // ✅ Secure user sessions and handle authentication errors.
+
+
 // 🟢 Day 3: Lens Tracking API
 // ✅ Implement CRUD operations for lens tracking.
 // ✅ API Routes:
-
 // GET /lenses
 // POST /lenses
 // DELETE /lenses/:id
 // ✅ Store user-specific lens tracking data in MySQL.
+
+
 // 🟢 Day 4: Smart Reminder System (Backend & UI)
 // ✅ Implement reminder system for lens replacements.
 // ✅ API Routes:
-
 // GET /reminders
 // POST /reminders
 // DELETE /reminders/:id
 // ✅ Send notifications based on lens expiry.
+
 // 🟢 Day 5: React Frontend – Authentication & Lens Tracking UI
 // ✅ Set up React Router for navigation.
 // ✅ Build Sign-up/Login pages with API integration.
@@ -76,3 +80,25 @@
 // ✅ Deploy frontend to Netlify/Vercel.
 // ✅ Conduct final end-to-end testing.
 // ✅ Ensure AI chatbot, calendar sync, gamification, JWT, and notifications work smoothly.
+
+
+import express from 'express';
+import cors from 'cors';
+import knex from 'knex';
+import authRoutes from './routes/authRoutes.js';
+import lensRoutes from './routes/lensRoutes.js';
+import reminderRoutes from './routes/reminderRoutes.js';
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+const db = knex(require('./knexfile.js'));
+
+// Use routes for different resources
+app.use('/api/auth', authRoutes(db));
+app.use('/api/lenses', lensRoutes(db));
+app.use('/api/reminders', reminderRoutes(db));
+
+const port = process.env.PORT || 5000;
+app.listen(port, () => console.log(`Server running on port ${port}`));
