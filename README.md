@@ -259,7 +259,10 @@ Request Body:
   "user_id": 7,
   "lens_id": 3,
   "reminder_time": "2024-03-01T05:00:00.000Z",
-  "message": "Time to replace your contact lens for the left eye."
+  "message": "Time to replace your contact lens for the left eye.",
+  "type": removal/replacement,
+  "status": pending/completed
+   
 }
 ]
 

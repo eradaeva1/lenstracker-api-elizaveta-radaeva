@@ -1,16 +1,4 @@
-// import knex from "../config/db.js";
 
-// export async function getReminders(user_id) {
-//   return knex("reminders").where({ user_id });
-// }
-
-// export async function addReminder(reminder) {
-//   return knex("reminders").insert(reminder);
-// }
-
-// export async function deleteReminder(id) {
-//   return knex("reminders").where({ id }).del();
-// }
 
 import knex from "../config/db.js"; // Adjust the path if needed
 
