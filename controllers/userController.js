@@ -37,25 +37,88 @@
 // }
 
 
+// import bcrypt from "bcryptjs";
+// import jwt from "jsonwebtoken";
+// import { createUser, getUserByEmail } from "../models/userModel.js";
+
+// export async function register(req, res) {
+//   const { name, email, password } = req.body;
+//   const hashedPassword = await bcrypt.hash(password, 10);
+//   await createUser({ name, email, password: hashedPassword });
+//   res.json({ message: "User registered successfully" });
+// }
+
+// export async function login(req, res) {
+//   const { email, password } = req.body;
+//   const user = await getUserByEmail(email);
+
+//   if (!user || !(await bcrypt.compare(password, user.password))) {
+//     return res.status(401).json({ error: "Invalid credentials" });
+//   }
+
+//   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+//   res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
+// }
+
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { createUser, getUserByEmail } from "../models/userModel.js";
 
+// Register a new user
 export async function register(req, res) {
-  const { name, email, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  await createUser({ name, email, password: hashedPassword });
-  res.json({ message: "User registered successfully" });
+  try {
+    const { username, email, password } = req.body;
+    
+    console.log("Received data:", req.body); // Debugging log
+    
+    if (!email || !password || !username) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Check if email already exists
+    const existingUser = await getUserByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ error: "Email already in use" });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the user in the database
+    await createUser({ username, email, password: hashedPassword });
+
+    res.json({ message: "User registered successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to register user" });
+  }
 }
 
+// Login a user and return a JWT token
 export async function login(req, res) {
-  const { email, password } = req.body;
-  const user = await getUserByEmail(email);
+  try {
+    const { email, password } = req.body;
+    const user = await getUserByEmail(email);
 
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ error: "Invalid credentials" });
+    // Check if the user exists and compare passwords
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    // Create a JWT token
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+    // Return the token and user details
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Login failed" });
   }
-
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-  res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
 }

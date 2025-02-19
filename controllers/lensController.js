@@ -1,42 +1,3 @@
-// import express from "express";
-// import { getAllLenses, addLens, deleteLens } from "../models/lensModel.js";
-// import authMiddleware from "../middlewares/authMiddleware.js";
-
-// const router = express.Router();
-
-// // Get all lenses for a user
-// router.get("/", authMiddleware, async (req, res) => {
-//   try {
-//     const lenses = await getAllLenses(req.user.id);
-//     res.json(lenses);
-//   } catch (error) {
-//     res.status(500).json({ error: `Failed to fetch lenses: ${error.message}` });
-//   }
-// });
-
-// router.post("/", authMiddleware, async (req, res) => {
-//     try {
-//       // Passing the user_id from req.user (which is set by authMiddleware) and the body of the request
-//       const lensData = { ...req.body, user_id: req.user.id };
-//       await addLens(lensData); // This function now accepts the data directly
-//       res.json({ message: "Lens added successfully" });
-//     } catch (error) {
-//       res.status(500).json({ error: `Failed to add lens: ${error.message}` });
-//     }
-//   });
-  
-//   // Route to delete a lens by ID
-//   router.delete("/:id", authMiddleware, async (req, res) => {
-//     try {
-//       // Calling the controller function to delete a lens by its ID
-//       await deleteLens(req.params.id); // The ID is taken from the URL parameter
-//       res.json({ message: "Lens deleted successfully" });
-//     } catch (error) {
-//       res.status(500).json({ error: `Failed to delete lens: ${error.message}` });
-//     }
-//   });
-
-// export default router;
 
 import knex from "../config/db.js"; // Knex instance for DB operations
 
@@ -52,13 +13,45 @@ export const getAllLenses = async (userId) => {
 };
 
 // Function to add a new lens to the database
+// export const addLens = async (lensData) => {
+//   try {
+//     // Insert the lens data into the lenses table and return the newly inserted lens data
+//     const [newLens] = await knex("lenses").insert(lensData).returning("*");
+//     return newLens;
+//   } catch (error) {
+//     throw new Error("Failed to add lens to the database");
+//   }
+// };
 export const addLens = async (lensData) => {
   try {
+    // Validate required fields
+    const { user_id, lens_name, replacement_schedule, start_date, end_date, lens_power, eye_side } = lensData;
+    
+    if (!user_id || !lens_name || !replacement_schedule || !start_date || !end_date || !lens_power || !eye_side) {
+      throw new Error("Missing required fields");
+    }
+
+    // Validate eye_side value (should be "left" or "right")
+    if (!["left", "right"].includes(eye_side)) {
+      throw new Error("Invalid eye_side. Must be 'left' or 'right'.");
+    }
+
     // Insert the lens data into the lenses table and return the newly inserted lens data
-    const [newLens] = await knex("lenses").insert(lensData).returning("*");
+    const [newLens] = await knex("lenses")
+      .insert({
+        user_id,
+        lens_name,
+        replacement_schedule,
+        start_date,
+        end_date,
+        lens_power,  // New lens power field
+        eye_side      // New eye side field
+      })
+      .returning("*");
+
     return newLens;
   } catch (error) {
-    throw new Error("Failed to add lens to the database");
+    throw new Error("Failed to add lens to the database: " + error.message);
   }
 };
 

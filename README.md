@@ -76,8 +76,7 @@ Backend:
 Node.js, Express.js
 Database: MySQL
 
-AI Services:
-OpenAI API (AI chatbot for lens care guidance)  - DeepSeek
+
 
 Frontend:
 React (UI Framework)
@@ -174,7 +173,6 @@ DELETE /reminders/:id: Remove a reminder
 
 
 
-
 Example API Requests and Responses
 
 User Authentication
@@ -184,7 +182,7 @@ Request Body:
 {
   "email": "user@example.com",
   "password": "securepassword"
-  "name": "John Doe"
+  "username": "John Doe"
 }
 
 Response:
@@ -223,10 +221,13 @@ Response:
 POST /lenses
 Request Body:
 {
-  "brand": "Acuvue",
-  "power": -2.50,
-  "wear_duration": 8,
-  "replacement_date": "2025-03-01"
+  "user_id": 17,
+  "lens_name": "Acuvue Oasys",
+  "replacement_schedule": 30,
+  "start_date": "2024-03-01",
+  "end_date": "2024-03-31",
+  "lens_power": "-3.25",
+  "eye_side": "right"
 }
 Response:
 {
@@ -255,8 +256,10 @@ POST /reminders
 Request Body:
 [
   {
-  "type": "removal",
-  "reminder_time": "2025-02-20T20:00:00Z"
+  "user_id": 7,
+  "lens_id": 3,
+  "reminder_time": "2024-03-01T05:00:00.000Z",
+  "message": "Time to replace your contact lens for the left eye."
 }
 ]
 

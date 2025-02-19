@@ -107,10 +107,10 @@ app.use((req, res, next) => {
     next();
   });
   
-  // Use routes for different resources
-  app.use("/users", userRoutes);
-  app.use("/lenses", lensRoutes);
-  app.use("/reminders", reminderRoutes);
+  // // Use routes for different resources
+  // app.use("/users", userRoutes);
+  // app.use("/lenses", lensRoutes);
+  // app.use("/reminders", reminderRoutes);
   
   // Graceful shutdown handler to close DB connection when server stops
   process.on('SIGINT', () => {
