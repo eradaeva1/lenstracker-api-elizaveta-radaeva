@@ -1,11 +1,11 @@
 
-import knex from "../config/db.js"; // Knex instance for DB operations
+import db from "../config/db.js"; // Knex instance for DB operations
 
 // Function to get all lenses for a user
 export const getAllLenses = async (userId) => {
   try {
     // Fetch lenses from the database where user_id matches the provided userId
-    const lenses = await knex("lenses").where("user_id", userId);
+    const lenses = await db("lenses").where("user_id", userId);
     return lenses;
   } catch (error) {
     throw new Error("No data yet");
@@ -28,7 +28,7 @@ export const addLens = async (lensData) => {
     }
 
     // Insert the lens data into the lenses table and return the newly inserted lens data
-    const [newLens] = await knex("lenses")
+    const [newLens] = await db("lenses")
       .insert({
         user_id,
         lens_name,
@@ -50,7 +50,7 @@ export const addLens = async (lensData) => {
 export const deleteLens = async (lensId) => {
   try {
     // Delete the lens by its ID
-    await knex("lenses").where("id", lensId).del();
+    await db("lenses").where("id", lensId).del();
   } catch (error) {
     throw new Error("Failed to delete lens");
   }

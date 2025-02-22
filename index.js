@@ -158,8 +158,7 @@ import cors from 'cors';
 import knex from 'knex';
 import userRoutes from './routes/userRoutes.js';
 import lensRoutes from './routes/lensRoutes.js';
-import reminderRoutes from './routes/reminderRoutes.js';
-import notificationRoutes from './routes/notificationRoute.js';
+import reminderRoutes from './routes/reminderRoutes.js';  // Keep this for reminder and notification handling
 import tokenRoutes from './routes/tokenRoutes.js';
 import dotenv from "dotenv";
 import knexConfig from './knexfile.js';
@@ -173,7 +172,7 @@ dotenv.config();
 const db = knex(knexConfig.development);
 
 // Schedule daily reminders at 9 AM
-cron.schedule("0 9 * * *", async () => {
+cron.schedule("32 21 * * *", async () => {
   try {
     console.log("Sending daily reminders...");
 
@@ -185,7 +184,7 @@ cron.schedule("0 9 * * *", async () => {
 
     // Send reminders via Axios for each user
     for (const user of users) {
-      await axios.post("http://localhost:5000/send-reminder", {
+      await axios.post("http://localhost:5000/reminders/send-reminder", {
         userId: user.id,
         title: "Lens Reminder",
         body: "Time to change your contact lenses!",
@@ -222,9 +221,8 @@ process.on('SIGINT', () => {
 // Use routes for different resources
 app.use("/users", userRoutes);
 app.use("/lenses", lensRoutes);
-app.use("/reminders", reminderRoutes);
+app.use("/reminders", reminderRoutes);  // This now handles reminders and notifications
 app.use("/", tokenRoutes);  // Handle storing FCM token
-app.use("/", notificationRoutes);  // Handle sending notifications
 
 // Set server port and start the application
 const PORT = process.env.PORT || 5000;

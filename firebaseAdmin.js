@@ -20,3 +20,4 @@ admin.initializeApp({
 
 // Export Firebase Admin SDK (admin) and messaging
 export { admin };
+export const messaging = admin.messaging();
