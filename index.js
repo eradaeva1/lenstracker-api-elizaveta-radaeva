@@ -164,6 +164,7 @@ import dotenv from "dotenv";
 import knexConfig from './knexfile.js';
 import cron from "node-cron";
 import axios from "axios";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize dotenv to load environment variables
 dotenv.config();
@@ -199,12 +200,12 @@ cron.schedule("32 21 * * *", async () => {
   }
 });
 
-// Initialize Express app
+
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Graceful shutdown handler
+
 process.on('SIGINT', () => {
   console.log('Shutting down server...');
   db.destroy()  // Close DB connection gracefully
@@ -218,6 +219,39 @@ process.on('SIGINT', () => {
     });
 });
 
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+app.post("/ask-gemini", async (req, res) => {
+  const { question } = req.body;
+
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+    // **Improved Prompt for Better AI Responses**
+    const prompt = `
+      You are an AI assistant for a contact lens tracking app called "LensTracker". 
+      Answer the following question in a **clear, friendly, and concise** manner, like an FAQ entry.
+
+      **Guidelines:**
+      - **Keep it short (2-4 sentences)**
+      - **Avoid technical jargon** (use simple explanations)
+      - **If it's health-related, suggest consulting an eye doctor**
+      - **Use bullet points if needed**
+      - **End with a helpful tip if possible**
+      
+      **User's Question:** "${question}"
+    `;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    res.json({ answer: text });
+  } catch (error) {
+    console.error("Error with Gemini API:", error);
+    res.status(500).json({ error: "Failed to generate response" });
+  }
+});
 // Use routes for different resources
 app.use("/users", userRoutes);
 app.use("/lenses", lensRoutes);
