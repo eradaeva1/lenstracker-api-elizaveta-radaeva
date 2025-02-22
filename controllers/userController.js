@@ -87,6 +87,10 @@ export async function register(req, res) {
     // Create the user in the database
     await createUser({ username, email, password: hashedPassword });
 
+    if (!email || !password || !username) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+    
     res.json({ message: "User registered successfully" });
   } catch (error) {
     console.error(error);

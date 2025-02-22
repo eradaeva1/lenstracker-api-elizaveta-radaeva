@@ -1,14 +1,3 @@
-// import express from "express";
-// import { getAllLenses, addLens, deleteLens } from "../controllers/lensController.js";
-// import  authMiddleware from "../middlewares/authMiddleware.js";
-
-// const router = express.Router();
-
-// router.get("/", authMiddleware, getAllLenses);
-// router.post("/", authMiddleware, addLens);
-// router.delete("/:id", authMiddleware, deleteLens);
-
-// export default router;
 
 import express from "express";
 import { getAllLenses, addLens, deleteLens } from "../controllers/lensController.js"; // Import controller methods

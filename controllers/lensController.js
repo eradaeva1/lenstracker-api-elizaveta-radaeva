@@ -8,20 +8,11 @@ export const getAllLenses = async (userId) => {
     const lenses = await knex("lenses").where("user_id", userId);
     return lenses;
   } catch (error) {
-    throw new Error("Failed to fetch lenses");
+    throw new Error("No data yet");
   }
 };
 
-// Function to add a new lens to the database
-// export const addLens = async (lensData) => {
-//   try {
-//     // Insert the lens data into the lenses table and return the newly inserted lens data
-//     const [newLens] = await knex("lenses").insert(lensData).returning("*");
-//     return newLens;
-//   } catch (error) {
-//     throw new Error("Failed to add lens to the database");
-//   }
-// };
+
 export const addLens = async (lensData) => {
   try {
     // Validate required fields

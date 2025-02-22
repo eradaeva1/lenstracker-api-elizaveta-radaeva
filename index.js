@@ -102,15 +102,10 @@ app.use(cors());
 const db = knex(knexConfig.development);
 
 // Middleware to inject the DB into every route (optional, if you want to use DB in routes)
-app.use((req, res, next) => {
-    req.db = db;  // Inject the DB into the request object
-    next();
-  });
-  
-  // // Use routes for different resources
-  // app.use("/users", userRoutes);
-  // app.use("/lenses", lensRoutes);
-  // app.use("/reminders", reminderRoutes);
+// app.use((req, res, next) => {
+//     req.db = db;  // Inject the DB into the request object
+//     next();
+//   });
   
   // Graceful shutdown handler to close DB connection when server stops
   process.on('SIGINT', () => {
