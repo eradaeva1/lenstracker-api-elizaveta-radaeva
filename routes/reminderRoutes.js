@@ -53,7 +53,7 @@
 import express from "express";
 import { getReminders, createReminder, removeReminder } from "../controllers/reminderController.js"; // Import controller functions
 import authMiddleware from "../middleware/authMiddleware.js"; // Ensure the user is authenticated
-import admin from "../firebaseAdmin.js"; // Firebase Admin SDK
+import { admin } from "../firebaseAdmin.js";  // Firebase Admin SDK
 import db from "../config/db.js";
 import { sendSMS } from "../config/twilioClient.js"; // Import Twilio SMS function
 

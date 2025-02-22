@@ -82,50 +82,150 @@
 // ✅ Ensure AI chatbot, calendar sync, gamification, JWT, and notifications work smoothly.
 
 
+// import express from 'express';
+// import cors from 'cors';
+// import knex from 'knex';
+// import userRoutes from './routes/userRoutes.js';
+// import lensRoutes from './routes/lensRoutes.js';
+// import reminderRoutes from './routes/reminderRoutes.js';
+// import dotenv from "dotenv";
+// import knexConfig from './knexfile.js';
+// import cron from "node-cron";
+// import axios from "axios";
+
+
+
+// // Run every day at 9 AM
+// cron.schedule("0 9 * * *", async () => {
+//   console.log("Sending daily reminders...");
+
+//   const [users] = await db.query("SELECT id FROM reminders WHERE reminder_date = CURDATE()");
+
+//   users.forEach(async (user) => {
+//     await axios.post("http://localhost:5000/api/send-reminder", {
+//       userId: user.id,
+//       title: "Lens Reminder",
+//       body: "Time to change your contact lenses!",
+//     });
+//   });
+
+//   console.log("Reminders sent.");
+// });
+
+
+
+
+// dotenv.config();
+
+
+// const app = express();
+// app.use(express.json());
+// app.use(cors());
+
+// const db = knex(knexConfig.development);
+
+// // Middleware to inject the DB into every route (optional, if you want to use DB in routes)
+// // app.use((req, res, next) => {
+// //     req.db = db;  // Inject the DB into the request object
+// //     next();
+// //   });
+  
+//   // Graceful shutdown handler to close DB connection when server stops
+//   process.on('SIGINT', () => {
+//     console.log('Shutting down server...');
+//     db.destroy()  // Close database connection gracefully
+//       .then(() => {
+//         console.log('DB connection closed.');
+//         process.exit(0);
+//       })
+//       .catch(err => {
+//         console.error('Error closing DB connection:', err);
+//         process.exit(1);
+//       });
+//   });
+  
+
+// // Use routes for different resources
+// app.use("/users", userRoutes);
+// app.use("/lenses", lensRoutes);
+// app.use("/reminders", reminderRoutes);
+
+// const PORT = process.env.PORT || 5000;
+// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 import express from 'express';
 import cors from 'cors';
 import knex from 'knex';
 import userRoutes from './routes/userRoutes.js';
 import lensRoutes from './routes/lensRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
+import notificationRoutes from './routes/notificationRoute.js';
+import tokenRoutes from './routes/tokenRoutes.js';
 import dotenv from "dotenv";
 import knexConfig from './knexfile.js';
+import cron from "node-cron";
+import axios from "axios";
 
-
+// Initialize dotenv to load environment variables
 dotenv.config();
 
+// Initialize database connection
+const db = knex(knexConfig.development);
 
+// Schedule daily reminders at 9 AM
+cron.schedule("0 9 * * *", async () => {
+  try {
+    console.log("Sending daily reminders...");
+
+    // Query to get users with upcoming reminders for today
+    const users = await db('reminders')
+      .whereRaw('DATE(reminder_date) = CURDATE()') // Ensure reminder_date is for today
+      .join('users', 'reminders.user_id', '=', 'users.id') // Assuming 'user_id' in reminders table
+      .select('users.id', 'users.email'); // Fetch user ID and email
+
+    // Send reminders via Axios for each user
+    for (const user of users) {
+      await axios.post("http://localhost:5000/send-reminder", {
+        userId: user.id,
+        title: "Lens Reminder",
+        body: "Time to change your contact lenses!",
+      });
+
+      console.log(`Reminder sent to user ID: ${user.id}, Email: ${user.email}`);
+    }
+
+    console.log("All reminders sent.");
+  } catch (error) {
+    console.error("Error sending reminders:", error.message);
+  }
+});
+
+// Initialize Express app
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const db = knex(knexConfig.development);
-
-// Middleware to inject the DB into every route (optional, if you want to use DB in routes)
-// app.use((req, res, next) => {
-//     req.db = db;  // Inject the DB into the request object
-//     next();
-//   });
-  
-  // Graceful shutdown handler to close DB connection when server stops
-  process.on('SIGINT', () => {
-    console.log('Shutting down server...');
-    db.destroy()  // Close database connection gracefully
-      .then(() => {
-        console.log('DB connection closed.');
-        process.exit(0);
-      })
-      .catch(err => {
-        console.error('Error closing DB connection:', err);
-        process.exit(1);
-      });
-  });
-  
+// Graceful shutdown handler
+process.on('SIGINT', () => {
+  console.log('Shutting down server...');
+  db.destroy()  // Close DB connection gracefully
+    .then(() => {
+      console.log('DB connection closed.');
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error('Error closing DB connection:', err);
+      process.exit(1);
+    });
+});
 
 // Use routes for different resources
 app.use("/users", userRoutes);
 app.use("/lenses", lensRoutes);
 app.use("/reminders", reminderRoutes);
+app.use("/", tokenRoutes);  // Handle storing FCM token
+app.use("/", notificationRoutes);  // Handle sending notifications
 
+// Set server port and start the application
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
