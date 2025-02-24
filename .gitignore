@@ -1,5 +1,5 @@
-#.env
-#.node_modules
-#.firebaseAdmin.js
-#.lenstracker-e6592-firebase-adminsdk-fbsvc-a75e753f6c.json
+.env
+.node_modules
+.firebaseAdmin.js
+.lenstracker-e6592-firebase-adminsdk-fbsvc-a75e753f6c.json
 
