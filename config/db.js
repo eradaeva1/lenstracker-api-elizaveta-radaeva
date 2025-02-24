@@ -14,18 +14,3 @@ const db = knex.default({
 });
 
 export default db;
-
-// import mysql from "mysql2";
-
-// // Create a MySQL database connection
-// const db = mysql.createPool({
-//   host: "localhost",
-//   user: "your_db_user",
-//   password: "your_db_password",
-//   database: "your_database_name",
-//   waitForConnections: true,
-//   connectionLimit: 10,
-//   queueLimit: 0,
-// });
-
-// export default db;
