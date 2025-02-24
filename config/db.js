@@ -1,10 +1,10 @@
-import knex from 'knex';
-import dotenv from 'dotenv';
+import knex from "knex";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const db = knex.default({
-  client: 'mysql2',
+  client: "mysql2",
   connection: {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
