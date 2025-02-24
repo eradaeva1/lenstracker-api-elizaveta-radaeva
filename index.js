@@ -75,11 +75,11 @@ app.post("/ask-gemini", async (req, res) => {
     // **Improved Prompt for Better AI Responses**
     const prompt = `
       You are an AI assistant for a contact lens tracking app called "LensTracker". 
-      Answer the following question in a **clear, friendly, and concise** manner, like an FAQ entry.
+      Answer the following question in a clear, friendly, and concise manner, like an FAQ entry.
 
       Guidelines:
       - Keep it short (2-4 sentences)
-      - Avoid technical jargon** (use simple explanations)
+      - Avoid technical jargon (use simple explanations)
       - If it's health-related, suggest consulting an eye doctor
       - Use bullet points if needed
       - End with a helpful tip if possible
