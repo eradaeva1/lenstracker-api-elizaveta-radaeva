@@ -1,42 +1,76 @@
 
+// import express from "express";
+// import { getAllLenses, addLens, deleteLens } from "../controllers/lensController.js";
+// import { createReminder, removeReminder } from "../controllers/reminderController.js"; // Import reminder functions
+// import authMiddleware from "../middleware/authMiddleware.js";
+
+// const router = express.Router();
+
+// // Get all lenses for a user
+// router.get("/", authMiddleware, async (req, res) => {
+//   try {
+//     const lenses = await getAllLenses(req.user.id);
+//     res.json(lenses);
+//   } catch (error) {
+//     res.status(500).json({ error: `Failed to fetch lenses: ${error.message}` });
+//   }
+// });
+
+
+// router.post("/", authMiddleware, addLens)
+// Add a new lens & auto-create reminder
+// router.post("/", authMiddleware, async (req, res) => {
+//   try {
+//     const lensData = { ...req.body, user_id: req.user.id };
+//     const newLens = await addLens(lensData); // Add lens to DB
+
+//     // Create a reminder automatically based on lens duration
+//     const reminderData = {
+//       userId: req.user.id,
+//       lensId: newLens.id,
+//       title: `Replace ${lensData.brand} Lenses`,
+//       body: `It's time to change your ${lensData.brand} lenses!`,
+//       time: calculateReminderDate(lensData.type), // Auto-set time
+//     };
+
+//     await createReminder(reminderData); // Create reminder
+//     res.json({ message: "Lens added and reminder created successfully" });
+//   } catch (error) {
+//     res.status(500).json({ error: `Failed to add lens: ${error.message}` });
+//   }
+// });
+
+// Delete a lens & associated reminders
+// router.delete("/:id", authMiddleware, async (req, res) => {
+//   try {
+//     await deleteLens(req.params.id);
+//     await removeReminder(req.params.id); // Also delete reminders linked to lens
+//     res.json({ message: "Lens and its reminder deleted successfully" });
+//   } catch (error) {
+//     res.status(500).json({ error: `Failed to delete lens: ${error.message}` });
+//   }
+// });
+
+// // Function to auto-set reminder dates
+// const calculateReminderDate = (lensType) => {
+//   const today = new Date();
+//   if (lensType === "daily") return new Date(today.setDate(today.getDate() + 1)); // 1 day
+//   if (lensType === "biweekly") return new Date(today.setDate(today.getDate() + 14)); // 14 days
+//   if (lensType === "monthly") return new Date(today.setMonth(today.getMonth() + 1)); // 1 month
+//   return today; // Default fallback
+// };
+
+// export default router;
+
 import express from "express";
-import { getAllLenses, addLens, deleteLens } from "../controllers/lensController.js"; // Import controller methods
-import authMiddleware from "../middleware/authMiddleware.js"; // Import auth middleware to protect routes
+import { addLens, getAllLenses, deleteLens } from "../controllers/lensController.js";
+import authMiddleware from "../middleware/authMiddleware.js"; // Import auth middleware
 
 const router = express.Router();
 
-// Route to get all lenses for a user (GET /lenses)
-router.get("/", authMiddleware, async (req, res) => {
-  try {
-    // Fetch lenses for the authenticated user (using the user ID from JWT)
-    const lenses = await getAllLenses(req.user.id);
-    res.json(lenses);
-  } catch (error) {
-    res.status(500).json({ error: `Failed to fetch lenses: ${error.message}` });
-  }
-});
-
-// Route to add a new lens (POST /lenses)
-router.post("/", authMiddleware, async (req, res) => {
-  try {
-    // Add the user_id to the lens data (from the JWT decoded user)
-    const lensData = { ...req.body, user_id: req.user.id };
-    await addLens(lensData); // Insert the lens data into the database
-    res.json({ message: "Lens added successfully" });
-  } catch (error) {
-    res.status(500).json({ error: `Failed to add lens: ${error.message}` });
-  }
-});
-
-// Route to delete a lens by its ID (DELETE /lenses/:id)
-router.delete("/:id", authMiddleware, async (req, res) => {
-  try {
-    // Delete the lens by ID (from the URL parameter)
-    await deleteLens(req.params.id);
-    res.json({ message: "Lens deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: `Failed to delete lens: ${error.message}` });
-  }
-});
+// ✅ Protect all routes using authMiddleware
+router.post("/", authMiddleware, addLens);
+router.get("/", authMiddleware, getAllLenses);
+router.delete("/:id", authMiddleware, deleteLens);
 
 export default router;

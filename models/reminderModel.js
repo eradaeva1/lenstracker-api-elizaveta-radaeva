@@ -41,7 +41,7 @@ export const addReminder = async (reminderData) => {
       reminderData.reminder_time = date.toISOString().slice(0, 19).replace('T', ' '); // Convert to 'YYYY-MM-DD HH:MM:SS'
     }
 
-    const [newReminder] = await db('reminders').insert(reminderData).returning('*');
+    const [newReminder] = await db('reminders').insert(reminderData);
     
     console.log("New reminder added:", newReminder);  // Log the newly added reminder
     return newReminder;

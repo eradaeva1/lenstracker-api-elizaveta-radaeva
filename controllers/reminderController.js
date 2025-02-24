@@ -15,11 +15,27 @@ export const getReminders = async (req, res) => {
 // Add a new reminder
 export const createReminder = async (req, res) => {
   try {
-    // Passing the user_id from req.user (which is set by authMiddleware) and the body of the request
+    // Construct reminder data from the request body and user info
     const reminderData = { ...req.body, user_id: req.user.id };
-    await addReminder(reminderData); // Add reminder via the model function
-    res.json({ message: "Reminder set successfully" });
+
+    // Insert reminder into the database
+    const [newReminder] = await db('reminders').insert({
+      user_id: reminderData.user_id,
+      lens_id: reminderData.lensId,  // Assuming lensId is part of the body
+      reminder_time: reminderData.reminder_time,
+      message: reminderData.message,
+      type: reminderData.type,
+      status: reminderData.status,
+      reminder_date: reminderData.reminder_date,
+    }); // Get the inserted row for further processing (optional)
+
+    console.log("New reminder added:", newReminder);
+
+    // Return success response
+    res.json({ message: "Reminder set successfully", reminder: newReminder });
+
   } catch (error) {
+    console.error("Error adding reminder:", error);
     res.status(500).json({ error: "Failed to add reminder" });
   }
 };
