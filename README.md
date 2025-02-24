@@ -196,6 +196,9 @@ Request Body:
   "email": "user@example.com",
   "password": "securepassword"
 }
+
+
+
 Response:
 {
   "token": "your-jwt-token",
@@ -221,13 +224,13 @@ Response:
 POST /lenses
 Request Body:
 {
-  "user_id": 17,
-  "lens_name": "Acuvue Oasys",
-  "replacement_schedule": 30,
+    "user_id": 14,
+  "lens_name": "blah blah",
+ "replacement_schedule": 30,
   "start_date": "2024-03-01",
-  "end_date": "2024-03-31",
   "lens_power": "-3.25",
-  "eye_side": "right"
+  "eye_side": "right",
+  "end_date": "2024-03-31"
 }
 Response:
 {

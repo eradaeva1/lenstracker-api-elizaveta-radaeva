@@ -1,2 +1,6 @@
-* .env
-*.node_modules
+#
+.env
+node_modules
+lenstracker-e6592-firebase-adminsdk-fbsvc-a75e753f6c.json
+
+

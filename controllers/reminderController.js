@@ -1,42 +1,8 @@
-// import express from "express";
-// import { getAllReminders, addReminder, deleteReminder } from "../models/reminderModel.js";
-// import authMiddleware from "../middleware/authMiddleware.js";
-
-// const router = express.Router();
-
-// // Get all reminders for a user
-// router.get("/", authMiddleware, async (req, res) => {
-//   try {
-//     const reminders = await getAllReminders(req.user.id);
-//     res.json(reminders);
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to fetch reminders" });
-//   }
-// });
-
-// // Add a new reminder
-// router.post("/", authMiddleware, async (req, res) => {
-//   try {
-//     await addReminder({ ...req.body, user_id: req.user.id });
-//     res.json({ message: "Reminder set successfully" });
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to add reminder" });
-//   }
-// });
-
-// // Delete a reminder
-// router.delete("/:id", authMiddleware, async (req, res) => {
-//   try {
-//     await deleteReminder(req.params.id);
-//     res.json({ message: "Reminder deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to delete reminder" });
-//   }
-// });
-
-// export default router;
-
-import { getAllReminders, addReminder, deleteReminder } from "../models/reminderModel.js"; // Import model functions
+import {
+  getAllReminders,
+  addReminder,
+  deleteReminder,
+} from "../models/reminderModel.js"; // Import model functions
 
 // Get all reminders for a user
 export const getReminders = async (req, res) => {
@@ -51,11 +17,26 @@ export const getReminders = async (req, res) => {
 // Add a new reminder
 export const createReminder = async (req, res) => {
   try {
-    // Passing the user_id from req.user (which is set by authMiddleware) and the body of the request
+    // Construct reminder data from the request body and user info
     const reminderData = { ...req.body, user_id: req.user.id };
-    await addReminder(reminderData); // Add reminder via the model function
-    res.json({ message: "Reminder set successfully" });
+
+    // Insert reminder into the database
+    const [newReminder] = await db("reminders").insert({
+      user_id: reminderData.user_id,
+      lens_id: reminderData.lensId, // Assuming lensId is part of the body
+      reminder_time: reminderData.reminder_time,
+      message: reminderData.message,
+      type: reminderData.type,
+      status: reminderData.status,
+      reminder_date: reminderData.reminder_date,
+    }); // Get the inserted row for further processing (optional)
+
+    console.log("New reminder added:", newReminder);
+
+    // Return success response
+    res.json({ message: "Reminder set successfully", reminder: newReminder });
   } catch (error) {
+    console.error("Error adding reminder:", error);
     res.status(500).json({ error: "Failed to add reminder" });
   }
 };

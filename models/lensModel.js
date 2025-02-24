@@ -12,13 +12,13 @@
 //   return knex("lenses").where({ id }).del();
 // }
 
-import knex from "../config/db.js"; // Import knex instance
+import db from "../config/db.js"; // Import knex instance
 
 // Function to retrieve all lenses for a user
 export const getAllLenses = async (userId) => {
   try {
     // Query the lenses table to fetch all lenses for the given user_id
-    const lenses = await knex("lenses").where("user_id", userId);
+    const lenses = await db("lenses").where("user_id", userId);
     return lenses;
   } catch (error) {
     throw new Error("Failed to fetch lenses");
@@ -29,7 +29,7 @@ export const getAllLenses = async (userId) => {
 export const addLens = async (lensData) => {
   try {
     // Insert the lens data into the lenses table and return the inserted data
-    const [newLens] = await knex("lenses").insert(lensData).returning("*");
+    const [newLens] = await db("lenses").insert(lensData).returning("*");
     return newLens;
   } catch (error) {
     throw new Error("Failed to add lens to the database");
@@ -40,7 +40,7 @@ export const addLens = async (lensData) => {
 export const deleteLens = async (lensId) => {
   try {
     // Delete the lens from the lenses table using the lens ID
-    await knex("lenses").where("id", lensId).del();
+    await db("lenses").where("id", lensId).del();
   } catch (error) {
     throw new Error("Failed to delete lens");
   }

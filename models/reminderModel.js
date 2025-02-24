@@ -1,12 +1,12 @@
 
 
-import knex from "../config/db.js"; // Adjust the path if needed
+import db from "../config/db.js"; // Adjust the path if needed
 
 
 // Get all reminders for a user
 export const getAllReminders = async () => {
   try {
-    const reminders = await knex('reminders')
+    const reminders = await db('reminders')
       .join('users', 'reminders.user_id', '=', 'users.id')  // Example of a join if needed
       .select('reminders.id', 'reminders.reminder_time', 'users.username', 'reminders.message');
     return reminders;
@@ -41,7 +41,7 @@ export const addReminder = async (reminderData) => {
       reminderData.reminder_time = date.toISOString().slice(0, 19).replace('T', ' '); // Convert to 'YYYY-MM-DD HH:MM:SS'
     }
 
-    const [newReminder] = await knex('reminders').insert(reminderData).returning('*');
+    const [newReminder] = await db('reminders').insert(reminderData);
     
     console.log("New reminder added:", newReminder);  // Log the newly added reminder
     return newReminder;
@@ -54,7 +54,7 @@ export const addReminder = async (reminderData) => {
 // Delete a reminder by ID
 export const deleteReminder = async (id) => {
   try {
-    await knex('reminders')
+    await db('reminders')
       .where('id', id)
       .del();  // 'del' is the Knex method to delete records
   } catch (error) {
