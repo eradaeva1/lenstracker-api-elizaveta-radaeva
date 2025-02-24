@@ -1,10 +1,8 @@
+import db from "../config/db.js";
 
-import db from "../config/db.js"; // Ensure Knex DB is imported
-
-// ✅ Get All Lenses (User-specific)
 export const getAllLenses = async (req, res) => {
   try {
-    const userId = req.user.id; // ✅ Get user ID from JWT
+    const userId = req.user.id;
     const lenses = await db("lenses").where("user_id", userId);
 
     if (lenses.length === 0) {
@@ -18,88 +16,41 @@ export const getAllLenses = async (req, res) => {
   }
 };
 
-// ✅ Add a New Lens (User-specific)
-// export const addLens = async (req, res) => {
-//   try {
-//     console.log("Received lens data:", req.body);
-
-//     const user_id = req.user.id; // JWT user ID
-//     const { lens_name, replacement_schedule, start_date, lens_power, eye_side } = req.body;
-
-//     if (!lens_name || !replacement_schedule || !start_date || !lens_power || !eye_side) {
-//       console.error("❌ Missing required fields:", req.body);
-//       return res.status(400).json({ message: "Missing required fields" });
-//     }
-
-//     if (!["left", "right"].includes(eye_side)) {
-//       return res.status(400).json({ message: "Invalid eye_side. Must be 'left' or 'right'." });
-//     }
-
-//     // Convert replacement_schedule to number of days
-//     const scheduleDays = {
-//       daily: 1,
-//       weekly: 7,
-//       biweekly: 14,
-//       monthly: 30,
-//     };
-
-//     const daysToAdd = scheduleDays[replacement_schedule.toLowerCase()];
-//     if (!daysToAdd) {
-//       console.error("❌ Invalid replacement schedule:", replacement_schedule);
-//       return res.status(400).json({ message: "Invalid replacement schedule" });
-//     }
-
-//     const startDate = new Date(start_date);
-//     const endDate = new Date(startDate);
-//     endDate.setDate(endDate.getDate() + daysToAdd);
-
-//     console.log("✅ Inserting into DB:", {
-//       user_id,
-//       lens_name,
-//       replacement_schedule: daysToAdd, // Store as number
-//       start_date,
-//       end_date,
-//       lens_power,
-//       eye_side,
-//     });
-
-//     // Insert into MySQL (NO .returning("*") because MySQL doesn't support it)
-//     await db("lenses").insert({
-//       user_id,
-//       lens_name,
-//       replacement_schedule: daysToAdd, // Store as integer
-//       start_date,
-//       end_date: endDate.toISOString().split("T")[0],
-//       lens_power,
-//       eye_side,
-//     });
-
-//     res.status(201).json({ message: "Lens added successfully" });
-//   } catch (error) {
-//     // console.error("🔥 Error adding lens:", error.message);
-//     res.status(500).json({ message: "Failed to add lens to the database", error: error.message });
-//   }
-// };
-
 export const addLens = async (req, res) => {
   try {
     console.log("Received lens data:", req.body);
 
     // Extract user_id from JWT payload (assuming it's set in middleware)
-    const user_id = req.user?.id; 
+    const user_id = req.user?.id;
 
     // Destructure request body
-    const { lens_name, replacement_schedule, start_date, lens_power, eye_side, end_date } = req.body;
+    const {
+      lens_name,
+      replacement_schedule,
+      start_date,
+      lens_power,
+      eye_side,
+      end_date,
+    } = req.body;
 
     // Validate required fields
-    if (!user_id || !lens_name || !replacement_schedule || !start_date || !lens_power || !eye_side) {
+    if (
+      !user_id ||
+      !lens_name ||
+      !replacement_schedule ||
+      !start_date ||
+      !lens_power ||
+      !eye_side
+    ) {
       console.error("❌ Missing required fields:", req.body);
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     // Validate `eye_side`
     if (!["left", "right"].includes(eye_side.toLowerCase())) {
-      return res.status(400).json({ message: "Invalid eye_side. Must be 'left' or 'right'." });
+      return res
+        .status(400)
+        .json({ message: "Invalid eye_side. Must be 'left' or 'right'." });
     }
 
     // Ensure `replacement_schedule` is an integer
@@ -110,28 +61,31 @@ export const addLens = async (req, res) => {
       monthly: 30,
     };
 
-    
     const daysToAdd = validSchedules;
     if (!daysToAdd) {
       console.error("❌ Invalid replacement schedule:", replacement_schedule);
-      return res.status(400).json({ message: "Invalid replacement schedule. Use 'daily', 'weekly', 'biweekly', or 'monthly'." });
+      return res
+        .status(400)
+        .json({
+          message:
+            "Invalid replacement schedule. Use 'daily', 'weekly', 'biweekly', or 'monthly'.",
+        });
     }
 
-    
     // Ensure `start_date` is a valid date
     const startDate = new Date(start_date);
     if (isNaN(startDate.getTime())) {
       console.error("❌ Invalid start_date:", start_date);
-      return res.status(400).json({ message: "Invalid start_date format. Use YYYY-MM-DD." });
+      return res
+        .status(400)
+        .json({ message: "Invalid start_date format. Use YYYY-MM-DD." });
     }
     console.log("Received start_date:", start_date, typeof start_date);
 
-    
     // Calculate `end_date`
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + replacement_schedule);
-console.log(endDate);
-
+    console.log(endDate);
 
     // Ensure the user exists before inserting the lens
     const [userExists] = await db("users").where({ id: user_id }).limit(1);
@@ -145,19 +99,12 @@ console.log(endDate);
       .first();
 
     if (existingLens) {
-      return res.status(409).json({ message: "A lens for this eye on this start date already exists." });
+      return res
+        .status(409)
+        .json({
+          message: "A lens for this eye on this start date already exists.",
+        });
     }
-
-    // console.log("✅ Inserting into DB:", {
-    //   user_id,
-    //   lens_name,
-    //   // replacement_schedule,
-    //   start_date,
-    //   end_date: replacement_schedule,
-    //   // end_date: endDate.toISOString().split("T")[0],
-    //   lens_power,
-    //   eye_side,
-    // });
 
     // Insert into MySQL
     await db("lenses").insert({
@@ -171,15 +118,16 @@ console.log(endDate);
     });
 
     res.status(201).json({ message: "Lens added successfully" });
-
   } catch (error) {
     console.error("🔥 Error adding lens:", error.message);
-    res.status(500).json({ message: "Failed to add lens to the database", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Failed to add lens to the database",
+        error: error.message,
+      });
   }
 };
-
-
-
 
 // ✅ Delete Lens (User-specific)
 export const deleteLens = async (req, res) => {
@@ -191,7 +139,9 @@ export const deleteLens = async (req, res) => {
     const lens = await db("lenses").where({ id, user_id: userId }).first();
 
     if (!lens) {
-      return res.status(404).json({ message: "Lens not found or unauthorized" });
+      return res
+        .status(404)
+        .json({ message: "Lens not found or unauthorized" });
     }
 
     await db("lenses").where({ id }).del();

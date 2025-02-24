@@ -1,6 +1,8 @@
-
-
-import { getAllReminders, addReminder, deleteReminder } from "../models/reminderModel.js"; // Import model functions
+import {
+  getAllReminders,
+  addReminder,
+  deleteReminder,
+} from "../models/reminderModel.js"; // Import model functions
 
 // Get all reminders for a user
 export const getReminders = async (req, res) => {
@@ -19,9 +21,9 @@ export const createReminder = async (req, res) => {
     const reminderData = { ...req.body, user_id: req.user.id };
 
     // Insert reminder into the database
-    const [newReminder] = await db('reminders').insert({
+    const [newReminder] = await db("reminders").insert({
       user_id: reminderData.user_id,
-      lens_id: reminderData.lensId,  // Assuming lensId is part of the body
+      lens_id: reminderData.lensId, // Assuming lensId is part of the body
       reminder_time: reminderData.reminder_time,
       message: reminderData.message,
       type: reminderData.type,
@@ -33,7 +35,6 @@ export const createReminder = async (req, res) => {
 
     // Return success response
     res.json({ message: "Reminder set successfully", reminder: newReminder });
-
   } catch (error) {
     console.error("Error adding reminder:", error);
     res.status(500).json({ error: "Failed to add reminder" });

@@ -6,7 +6,10 @@ import db from "../config/db.js"; // MySQL Database
 export const sendReminderNotification = async (userId, title, body) => {
   try {
     // Fetch user's FCM token and phone number from the database
-    const [rows] = await db.query("SELECT token, phone FROM users WHERE id = ?", [userId]);
+    const [rows] = await db.query(
+      "SELECT token, phone FROM users WHERE id = ?",
+      [userId]
+    );
 
     if (rows.length === 0) {
       throw new Error("User not found");
