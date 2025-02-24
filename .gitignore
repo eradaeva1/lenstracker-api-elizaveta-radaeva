@@ -1,6 +1,6 @@
-*.env
-*.node_modules
-*.firebaseAdmin.js
-*.lenstracker-e6592-firebase-adminsdk-fbsvc-a75e753f6c.json
+.env
+.node_modules
+.firebaseAdmin.js
+.lenstracker-e6592-firebase-adminsdk-fbsvc-a75e753f6c.json
 
 # *twilio code: 92CF6HM3Z7FPNKN9RP65B76L
